@@ -23091,21 +23091,63 @@ class App extends react__WEBPACK_IMPORTED_MODULE_0___default.a.Component {
       channels: [],
       users: [],
       messages: [],
-      activeChannel: {}
+      activeChannel: {},
+      connected: false
     };
+  }
+
+  componentDidMount() {
+    let ws = this.ws = new WebSocket('ws://echo.websocket.org');
+    ws.onmessage = this.message.bind(this);
+    ws.onopen = this.open.bind(this);
+    ws.onclose = this.close.bind(this);
+  }
+
+  message(e) {
+    const event = JSON.parse(e.data);
+
+    if (event.name === 'channel add') {
+      this.newChannel(event.data);
+    }
+  }
+
+  open() {
+    this.setState({
+      connected: true
+    });
+  }
+
+  close() {
+    this.setState({
+      connected: false
+    });
+  }
+
+  newChannel(channel) {
+    let {
+      channels
+    } = this.state;
+    channels.push(channel);
+    this.setState({
+      channels
+    });
   }
 
   addChannel(name) {
     let {
       channels
-    } = this.state;
-    channels.push({
-      id: channels.length,
-      name
-    });
-    this.setState({
-      channels
-    }); // TODO: Send to server
+    } = this.state; // channels.push({ id: channels.length, name });
+    // this.setState({ channels });
+    // TODO: Send to server
+
+    let msg = {
+      name: 'add channel',
+      data: {
+        id: channels.length,
+        name
+      }
+    };
+    this.ws.send(JSON.stringify(msg));
   }
 
   setChannel(activeChannel) {
