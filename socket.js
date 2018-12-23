@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 
 class Socket {
   constructor(
-    ws = new WebSocket('wss://echo.websocket.org/'),
+    ws = new WebSocket('ws://localhost:4000'),
     ee = new EventEmitter()
   ) {
     this.ws = ws;
